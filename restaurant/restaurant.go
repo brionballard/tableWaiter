@@ -50,8 +50,8 @@ func IsRestaurantOpen(curr time.Time) int {
 	}
 }
 
-// HandleUserClosedEntranceResponse handles response to user if not open/taking users
-func HandleUserClosedEntranceResponse(customerEntered time.Time) {
+// HandleCurrentlyClosedResponse handles response to user if not open/taking users
+func HandleCurrentlyClosedResponse(customerEntered time.Time) {
 	restaurantState := IsRestaurantOpen(customerEntered)
 
 	if restaurantState < 2 {
