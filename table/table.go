@@ -85,7 +85,7 @@ func generateTableData() []Table {
 			PreviouslyReserved: reserved,
 			StartReservation:   startTime,
 			EndReservation:     endTime,
-			WaitTime:           waitTime, // TODO:  difference in EndReservation - StartReservation
+			WaitTime:           waitTime,
 		}
 
 		tables = append(tables, table)
