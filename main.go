@@ -5,6 +5,7 @@ import (
 	"log"
 	"tableWaiter/party"
 	"tableWaiter/restaurant"
+	"time"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 
 	restaurant.Greet()
 	restaurant.DeclareHours()
-	// restaurant.HandleUserClosedEntranceResponse(time.Now()) // handles responding to the user if not open/taking res
+	restaurant.HandleUserClosedEntranceResponse(time.Now()) // handles responding to the user if not open/taking res
 	err := potentialParty.AskForInfo()
 	if err != nil {
 		log.Fatal("We must gather all of your information to be seated.")
