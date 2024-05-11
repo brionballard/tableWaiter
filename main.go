@@ -2,26 +2,23 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"tableWaiter/party"
 	"tableWaiter/restaurant"
-	"time"
 )
 
 func main() {
-	setupDB()
+	var potentialParty party.Party
 
-	var partyName string
-	var partySize int
-
-	customerEntered := time.Now()
+	setupDB() // setup necessary database
 
 	restaurant.Greet()
 	restaurant.DeclareHours()
-	restaurant.HandleUserClosedEntranceResponse(customerEntered) // handles responding to the user if not open/taking res
+	// restaurant.HandleUserClosedEntranceResponse(time.Now()) // handles responding to the user if not open/taking res
+	err := potentialParty.AskForInfo()
+	if err != nil {
+		log.Fatal("We must gather all of your information to be seated.")
+	}
 
-	fmt.Println("Can I get the name for your party?")
-	fmt.Scanln(&partyName)
-
-	fmt.Println("And how many are in your party?")
-	fmt.Scanln(&partySize)
-
+	fmt.Println(potentialParty)
 }

@@ -17,12 +17,19 @@ const (
 	Open                 = 2
 	NotTakingRes         = 1
 	Closed               = 0
+
+	TableCount         = 12
+	MaxSeatingPerTable = 12
 )
 
+var TableSections = []string{"A", "B", "C", "D"}
+
+// Greet welcomes the user
 func Greet() {
 	fmt.Println("Hi, welcome to TBL!")
 }
 
+// DeclareHours declares hours of business to the user
 func DeclareHours() {
 	fmt.Println("We are open from 4 p.m. to 12 p.m.")
 	fmt.Println("We stop taking reservations at 10 p.m.")

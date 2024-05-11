@@ -4,14 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bxcodec/faker/v4"
+	"log"
 	"os"
+	"tableWaiter/restaurant"
 	"tableWaiter/utils"
 )
-
-const tableCount int = 12
-const maxSeatCount int = 12
-
-var tableSections = []string{"A", "B", "C", "D"}
 
 const inMemoryTableDBFileName string = "tables.json"
 
@@ -28,6 +25,7 @@ type Table struct {
 	Reserved         bool   `json:"reserved"`
 	StartReservation string `json:"startReservation"`
 	EndReservation   string `json:"endReservation"`
+	WaitTime         int    `json:"waitTime"`
 }
 
 // Init initializes the table database.
@@ -35,28 +33,36 @@ func (t *TableDB) Init() {
 	writeInitialTableData(generateTableData())
 }
 
+// generateTableData generates fake table data for the resteraunt
 func generateTableData() []Table {
 	tables := []Table{}
 
-	for i := 1; i <= tableCount; i++ {
+	for i := 1; i <= restaurant.TableCount; i++ {
 		reserved := utils.GenerateRandomBool()
 		startTime := ""
 		partyName := ""
+		waitTime := 0
 
 		if reserved {
-			startTime = utils.GenerateRandomTimeStringBetweenOpenAndClose()
+			timeString, err := utils.GenerateRandomTimeString(restaurant.OpensAsInt, restaurant.ReservationsEndAsInt)
+			if err != nil {
+				log.Fatal("Failed to generate fake data.")
+			}
+			startTime = timeString
 			partyName = faker.LastName()
+			waitTime = utils.GetRandomSBetweenMax(25)
 		}
 
 		table := Table{
 			Id:               faker.UUIDHyphenated(),
 			Available:        reserved, // Every table is set to available when restaurant is initialized
-			Seats:            getRandomSeatCount(),
-			Section:          getRandomSection(),
+			Seats:            utils.GetRandomSBetweenMax(restaurant.MaxSeatingPerTable),
+			Section:          utils.GetRandomStringFromSlice(restaurant.TableSections),
 			CurrentParty:     partyName,
 			Reserved:         reserved,
 			StartReservation: startTime,
 			EndReservation:   "",
+			WaitTime:         waitTime,
 		}
 
 		tables = append(tables, table)
@@ -78,27 +84,4 @@ func writeInitialTableData(t []Table) {
 	if err != nil {
 		fmt.Println(err)
 	}
-}
-
-func getRandomSection() string {
-	sectionNum, err := faker.RandomInt(0, len(tableSections)-1, 1)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	index := sectionNum[0]
-	if sectionNum[0] > len(tableSections) {
-		index = len(tableSections)
-	}
-
-	return tableSections[index]
-}
-
-func getRandomSeatCount() int {
-	seatCount, err := faker.RandomInt(2, maxSeatCount, 1)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	return seatCount[0]
 }
