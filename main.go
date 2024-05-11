@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"tableWaiter/party"
 	"tableWaiter/restaurant"
-	"time"
 )
 
 func main() {
@@ -15,12 +13,12 @@ func main() {
 
 	restaurant.Greet()
 	restaurant.DeclareHours()
-	restaurant.HandleCurrentlyClosedResponse(time.Now())
+	//restaurant.HandleCurrentlyClosedResponse(time.Now())
 
 	err := potentialParty.AskForInfo()
 	if err != nil {
 		log.Fatal("We must gather all of your information to be seated.")
 	}
 
-	fmt.Println(potentialParty)
+	potentialParty.Seat()
 }

@@ -17,15 +17,15 @@ type TableDB struct{}
 
 // Table represents a single record in the table db
 type Table struct {
-	Id               string `json:"id"`
-	Available        bool   `json:"available"`
-	Seats            int    `json:"seats"`
-	Section          string `json:"section"`
-	CurrentParty     string `json:"currentParty"`
-	Reserved         bool   `json:"reserved"`
-	StartReservation string `json:"startReservation"`
-	EndReservation   string `json:"endReservation"`
-	WaitTime         int    `json:"waitTime"`
+	Id                 string `json:"id"`
+	Available          bool   `json:"available"`
+	Seats              int    `json:"seats"`
+	Section            string `json:"section"`
+	CurrentParty       string `json:"currentParty"`
+	PreviouslyReserved bool   `json:"previouslyReserved"`
+	StartReservation   string `json:"startReservation"`
+	EndReservation     string `json:"endReservation"`
+	WaitTime           int    `json:"waitTime"`
 }
 
 // Init initializes the table database.
@@ -54,15 +54,15 @@ func generateTableData() []Table {
 		}
 
 		table := Table{
-			Id:               faker.UUIDHyphenated(),
-			Available:        reserved, // Every table is set to available when restaurant is initialized
-			Seats:            utils.GetRandomSBetweenMax(restaurant.MaxSeatingPerTable),
-			Section:          utils.GetRandomStringFromSlice(restaurant.TableSections),
-			CurrentParty:     partyName,
-			Reserved:         reserved,
-			StartReservation: startTime,
-			EndReservation:   "",
-			WaitTime:         waitTime,
+			Id:                 faker.UUIDHyphenated(),
+			Available:          reserved, // Every table is set to available when restaurant is initialized
+			Seats:              utils.GetRandomSBetweenMax(restaurant.MaxSeatingPerTable),
+			Section:            utils.GetRandomStringFromSlice(restaurant.TableSections),
+			CurrentParty:       partyName,
+			PreviouslyReserved: reserved,
+			StartReservation:   startTime,
+			EndReservation:     "",
+			WaitTime:           waitTime,
 		}
 
 		tables = append(tables, table)
@@ -84,4 +84,41 @@ func writeInitialTableData(t []Table) {
 	if err != nil {
 		fmt.Println(err)
 	}
+}
+
+func GetTables() ([]Table, error) {
+	// Open the JSON file
+	file, err := os.Open(inMemoryTableDBFileName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open tables file: %w", err)
+	}
+	defer file.Close()
+
+	// Decode JSON into an array of Table structs
+	var tables []Table
+	if err := json.NewDecoder(file).Decode(&tables); err != nil {
+		return nil, fmt.Errorf("failed to decode tables JSON: %w", err)
+	}
+
+	return tables, nil
+}
+
+func FilterTablesBySize(tables []Table, max int) []Table {
+	var filteredTables []Table
+	for _, table := range tables {
+		if table.Seats >= max {
+			filteredTables = append(filteredTables, table)
+		}
+	}
+	return filteredTables
+}
+
+func FilterOutUnavailableTables(tables []Table) []Table {
+	var available []Table
+	for _, table := range tables {
+		if table.Available {
+			available = append(available, table)
+		}
+	}
+	return available
 }

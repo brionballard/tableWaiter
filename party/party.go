@@ -1,6 +1,11 @@
 package party
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/bxcodec/faker/v4"
+	"os"
+	"tableWaiter/table"
+)
 
 type Party struct {
 	Name  string `json:"name"`
@@ -60,10 +65,35 @@ func (p *Party) AskForPhone() error {
 }
 
 func (p *Party) Seat() {
-	// read in table data
-	// find table with minimum amount of seats
-	// if available reserve
-	// else if no available tables -- set waiting time
-	// in x time find available table
-	// Set currentParty to table
+	tables, err := table.GetTables()
+	if err != nil {
+		_ = fmt.Errorf("cannot currently retrieve tables: %w", err)
+	}
+
+	tablesWithAdequateSeating := table.FilterTablesBySize(tables, p.Size)
+	availableTables := table.FilterOutUnavailableTables(tablesWithAdequateSeating)
+
+	fmt.Println(len(availableTables))
+
+	if len(availableTables) > 0 {
+		// pick a random table and seat the party
+		tableIndex, _ := faker.RandomInt(1, len(availableTables)-1)
+		selectedTable := availableTables[tableIndex[0]]
+
+		p.FollowMe(selectedTable)
+	}
+
+	// Get average wait time of available tables
+	// inform party there is an x minute wait to be seated
+	// do some sort of set timeout type function while printing hashes
+	// select a table,
+	//	update CurrentParty,
+	//	update Available to false
+	//  update StartReservation
+	//	update EndReservation to 1.5 hours
+}
+
+func (p *Party) FollowMe(tbl table.Table) {
+	fmt.Printf("Okay %s you can follow me to table %s in section %s \n", p.Name, tbl.Id, tbl.Section)
+	os.Exit(0)
 }
