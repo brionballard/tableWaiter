@@ -2,13 +2,9 @@ package db
 
 type DB interface {
 	Init()
-	TableName() string
 }
 
+// Initialize specific table
 func InitializeTable(d DB) {
 	d.Init()
-}
-
-func GetTableName(d DB) string {
-	return d.TableName()
 }

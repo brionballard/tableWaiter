@@ -3,9 +3,9 @@ package table
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-
 	"github.com/bxcodec/faker/v4"
+	"os"
+	"tableWaiter/utils"
 )
 
 const tableCount int = 12
@@ -20,10 +20,14 @@ type TableDB struct{}
 
 // Table represents a single record in the table db
 type Table struct {
-	Id        string `json:"id"`
-	Available bool   `json:"available"`
-	Seats     int    `json:"seats"`
-	Section   string `json:"section"`
+	Id               string `json:"id"`
+	Available        bool   `json:"available"`
+	Seats            int    `json:"seats"`
+	Section          string `json:"section"`
+	CurrentParty     string `json:"currentParty"`
+	Reserved         bool   `json:"reserved"`
+	StartReservation string `json:"startReservation"`
+	EndReservation   string `json:"endReservation"`
 }
 
 // Init initializes the table database.
@@ -31,20 +35,28 @@ func (t *TableDB) Init() {
 	writeInitialTableData(generateTableData())
 }
 
-// TableName returns the name of the table database.
-func (t *TableDB) TableName() string {
-	return inMemoryTableDBFileName
-}
-
 func generateTableData() []Table {
 	tables := []Table{}
 
 	for i := 1; i <= tableCount; i++ {
+		reserved := utils.GenerateRandomBool()
+		startTime := ""
+		partyName := ""
+
+		if reserved {
+			startTime = utils.GenerateRandomTimeStringBetweenOpenAndClose()
+			partyName = faker.LastName()
+		}
+
 		table := Table{
-			Id:        faker.UUIDHyphenated(),
-			Available: true, // Every table is set to available when restaraunt is initialized
-			Seats:     getRandomSeatCount(),
-			Section:   getRandomSection(),
+			Id:               faker.UUIDHyphenated(),
+			Available:        reserved, // Every table is set to available when restaurant is initialized
+			Seats:            getRandomSeatCount(),
+			Section:          getRandomSection(),
+			CurrentParty:     partyName,
+			Reserved:         reserved,
+			StartReservation: startTime,
+			EndReservation:   "",
 		}
 
 		tables = append(tables, table)

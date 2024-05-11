@@ -6,8 +6,7 @@ import (
 )
 
 // Init all data deps
-func setupDataDependacies() {
+func setupDB() {
 	var tableDB = &table.TableDB{}
 	db.InitializeTable(tableDB)
-
 }
