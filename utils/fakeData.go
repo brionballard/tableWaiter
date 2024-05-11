@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/bxcodec/faker/v4"
+	"math/rand"
 	"tableWaiter/restaurant"
 	"time"
 )
@@ -26,6 +27,18 @@ func GenerateRandomTimeString(minHour int, maxHour int) (string, error) {
 func GenerateRandomNumForTimeString(start int, end int) int {
 	num, _ := faker.RandomInt(start, end, 1)
 	return num[0]
+}
+
+// GenerateRandomTimeBetween generates a random time between minTime and maxTime.
+func GenerateRandomTimeBetween(minTime, maxTime time.Time) (time.Time, error) {
+	if minTime.After(maxTime) {
+		return time.Time{}, fmt.Errorf("minTime cannot be after maxTime")
+	}
+
+	timeDiff := maxTime.Sub(minTime)
+	randomDuration := time.Duration(rand.Int63n(int64(timeDiff)))
+
+	return minTime.Add(randomDuration), nil
 }
 
 // formatTimeString formats the hour and minute into a string representation of time.

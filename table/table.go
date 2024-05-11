@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"github.com/bxcodec/faker/v4"
 	"log"
+	"math/rand"
 	"os"
 	"tableWaiter/restaurant"
 	"tableWaiter/utils"
+	"time"
 )
 
 const inMemoryTableDBFileName string = "tables.json"
@@ -40,29 +42,50 @@ func generateTableData() []Table {
 	for i := 1; i <= restaurant.TableCount; i++ {
 		reserved := utils.GenerateRandomBool()
 		startTime := ""
+		endTime := ""
 		partyName := ""
 		waitTime := 0
 
 		if reserved {
-			timeString, err := utils.GenerateRandomTimeString(restaurant.OpensAsInt, restaurant.ReservationsEndAsInt)
+			start, err := utils.GenerateRandomTimeString(restaurant.OpensAsInt, restaurant.ReservationsEndAsInt)
 			if err != nil {
 				log.Fatal("Failed to generate fake data.")
 			}
-			startTime = timeString
+
+			startTimeParsed, err := time.Parse(restaurant.TimeLayout, start)
+			if err != nil {
+				log.Fatal("Failed to parse startTime.")
+			}
+
+			// Generate a random duration between 30 minutes and 45 minutes
+			randomMinutes := rand.Intn(16) + 30 // Generates a random integer between 30 and 45
+			randomDuration := time.Duration(randomMinutes) * time.Minute
+			end, err := utils.GenerateRandomTimeBetween(startTimeParsed, startTimeParsed.Add(randomDuration))
+			if err != nil {
+				log.Fatal("Failed to generate random time for end reservation.")
+			}
+
+			startTime = start
+			endTime = end.Format(restaurant.TimeLayout)
+
 			partyName = faker.LastName()
-			waitTime = utils.GetRandomSBetweenMax(25)
+			// Calculate the wait time duration
+			waitTimeDuration := end.Sub(startTimeParsed)
+
+			// Convert the wait time duration to minutes
+			waitTime = int(waitTimeDuration.Minutes())
 		}
 
 		table := Table{
 			Id:                 faker.UUIDHyphenated(),
-			Available:          reserved, // Every table is set to available when restaurant is initialized
+			Available:          reserved,
 			Seats:              utils.GetRandomSBetweenMax(restaurant.MaxSeatingPerTable),
 			Section:            utils.GetRandomStringFromSlice(restaurant.TableSections),
 			CurrentParty:       partyName,
 			PreviouslyReserved: reserved,
 			StartReservation:   startTime,
-			EndReservation:     "",
-			WaitTime:           waitTime,
+			EndReservation:     endTime,
+			WaitTime:           waitTime, // TODO:  difference in EndReservation - StartReservation
 		}
 
 		tables = append(tables, table)

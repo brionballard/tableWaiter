@@ -11,7 +11,7 @@ const (
 	OpensAsInt           = 4
 	ReservationsEnd      = "10:00 PM"
 	ReservationsEndAsInt = 10
-	Closes               = "12:00 AM"
+	Closes               = "12:00 PM"
 	ClosesAsInt          = 12
 	TimeLayout           = "3:04 PM" // Time layout for parsing time strings
 	Open                 = 2
