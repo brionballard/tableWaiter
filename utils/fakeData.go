@@ -41,7 +41,7 @@ func GenerateRandomTimeBetween(minTime, maxTime time.Time) (time.Time, error) {
 	return minTime.Add(randomDuration), nil
 }
 
-// formatTimeString formats the hour and minute into a string representation of time.
+// FormatTimeString formats the hour and minute into a string representation of time.
 func FormatTimeString(a int, b int) string {
 	return time.Date(0, 1, 1, a, b, 0, 0, time.UTC).Format(restaurant.TimeLayout)
 }

@@ -5,8 +5,8 @@ import (
 	"tableWaiter/table"
 )
 
-// Init all data deps
+// setupDB all necessary databases and data for the program to run
 func setupDB() {
-	var tableDB = &table.TableDB{}
-	db.InitializeTable(tableDB)
+	var tableDb table.TableDb
+	db.InitializeTable(&tableDb)
 }

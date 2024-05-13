@@ -14,8 +14,8 @@ import (
 
 const inMemoryTableDBFileName string = "tables.json"
 
-// TableDB represents the table database.
-type TableDB struct{}
+// TableDb represents the table database.
+type TableDb struct{}
 
 // Table represents a single record in the table db
 type Table struct {
@@ -31,13 +31,13 @@ type Table struct {
 }
 
 // Init initializes the table database.
-func (t *TableDB) Init() {
+func (t *TableDb) Init() {
 	writeInitialTableData(generateTableData())
 }
 
-// generateTableData generates fake table data for the resteraunt
+// generateTableData generates fake table data for the restaurant
 func generateTableData() []Table {
-	tables := []Table{}
+	var tables []Table
 
 	for i := 1; i <= restaurant.TableCount; i++ {
 		reserved := utils.GenerateRandomBool()
@@ -109,6 +109,7 @@ func writeInitialTableData(t []Table) {
 	}
 }
 
+// GetTables retrieves all the tables from the Database
 func GetTables() ([]Table, error) {
 	// Open the JSON file
 	file, err := os.Open(inMemoryTableDBFileName)
@@ -126,16 +127,19 @@ func GetTables() ([]Table, error) {
 	return tables, nil
 }
 
-func FilterTablesBySize(tables []Table, max int) []Table {
+// FilterTablesBySize filters a slice of tables and returns all tables
+// where the number of seats is greater than a given int
+func FilterTablesBySize(tables []Table, min int) []Table {
 	var filteredTables []Table
 	for _, table := range tables {
-		if table.Seats >= max {
+		if table.Seats >= min {
 			filteredTables = append(filteredTables, table)
 		}
 	}
 	return filteredTables
 }
 
+// FilterOutUnavailableTables filters a slice of tables and returns only the available tables
 func FilterOutUnavailableTables(tables []Table) []Table {
 	var available []Table
 	for _, table := range tables {
